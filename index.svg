@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" style="display:block;background:#050506;overflow:hidden">
+  <title>Kkeep</title>
+  <foreignObject width="100%" height="100%">
+    <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+        <title>Kkeep</title>
+        <style><![CDATA[
+          :root { color-scheme: dark; }
+          * { box-sizing: border-box; }
+          html, body, #surface { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+          body { background: #050506; color: #f5f5f7; font: 14px system-ui, -apple-system, sans-serif; }
+          #surface { position: relative; }
+          #kkeep-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: #050506; }
+          [hidden] { display: none !important; }
+          #loading { position: absolute; inset: 0; display: grid; place-items: center; background: #050506; padding: 28px; }
+          .loading-card { width: min(100%, 340px); text-align: center; }
+          h1 { margin: 0 0 20px; font-size: 42px; font-weight: 650; letter-spacing: -2px; }
+          .spinner { width: 22px; height: 22px; margin: 0 auto 18px; border: 2px solid #25252b; border-top-color: #e7e7ed; border-radius: 50%; animation: spin 1s linear infinite; }
+          #status { margin: 0 0 10px; color: #b8b8c2; line-height: 1.5; }
+          #slow-note { color: #8e8e99; line-height: 1.5; margin: 0 0 18px; }
+          a { color: inherit; }
+          .direct { display: inline-block; color: #b8b8c2; padding: 10px; text-underline-offset: 4px; }
+          button { font: inherit; cursor: pointer; }
+          #retry { border: 1px solid #393940; border-radius: 10px; background: #18181d; color: #f5f5f7; padding: 10px 16px; margin: 0 4px 8px; }
+          #tools { position: fixed; z-index: 2; top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right)); }
+          #tools summary { display: grid; place-items: center; width: 36px; height: 32px; margin-left: auto; border: 1px solid #ffffff24; border-radius: 10px; background: #141419d9; color: #e5e5eb; cursor: pointer; list-style: none; opacity: .72; user-select: none; }
+          #tools summary::-webkit-details-marker { display: none; }
+          #tools summary:hover, #tools[open] summary { opacity: 1; }
+          #tools .panel { position: absolute; right: 0; top: 38px; width: 185px; padding: 5px; border: 1px solid #ffffff24; border-radius: 12px; background: #141419f5; box-shadow: 0 10px 30px #0005; }
+          #tools button, #tools a { display: block; width: 100%; border: 0; border-radius: 7px; padding: 11px 10px; background: transparent; color: #ededf2; text-align: left; text-decoration: none; font: inherit; }
+          #tools button:hover, #tools a:hover { background: #ffffff12; }
+          a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid #b5b5ff; outline-offset: 3px; }
+          .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+          @keyframes spin { to { transform: rotate(360deg); } }
+          @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+        ]]></style>
+      </head>
+      <body>
+        <main id="surface">
+          <div id="loading" role="status" aria-live="polite">
+            <div class="loading-card">
+              <h1>Kkeep</h1>
+              <div class="spinner" aria-hidden="true"></div>
+              <p id="status">Opening Kkeep…</p>
+              <p id="slow-note" hidden="hidden">Try again, or open Kkeep directly.</p>
+              <button id="retry" type="button" hidden="hidden">Reload Kkeep</button>
+              <div><a class="direct" data-direct="true" href="https://kkeep.fun/" target="_top">Open Kkeep directly</a></div>
+            </div>
+          </div>
+        </main>
+        <details id="tools">
+          <summary title="Kkeep tools"><span aria-hidden="true">•••</span><span class="sr-only">Kkeep tools</span></summary>
+          <div class="panel">
+            <button id="reload" type="button">Reload Kkeep</button>
+            <a data-direct="true" href="https://kkeep.fun/" target="_top">Open Kkeep directly ↗</a>
+          </div>
+        </details>
+        <script><![CDATA[
+          (function () {
+            'use strict';
+            var HOME = 'https://kkeep.fun/';
+            var XHTML = 'http://www.w3.org/1999/xhtml';
+            var surface = document.getElementById('surface');
+            var loading = document.getElementById('loading');
+            var status = document.getElementById('status');
+            var slowNote = document.getElementById('slow-note');
+            var retry = document.getElementById('retry');
+            var tools = document.getElementById('tools');
+            var timer;
+
+            function destination(raw) {
+              if (!raw) return HOME;
+              if (raw.length > 4096) return HOME;
+              var decoded = raw;
+              try {
+                // Validate decoded variants too; encoded slashes must not change the origin.
+                for (var i = 0; i < 4; i += 1) {
+                  if (decoded.charAt(0) !== '/' || decoded.indexOf('//') === 0 || /[\\\u0000-\u001f\u007f]/.test(decoded)) return HOME;
+                  var next = decodeURIComponent(decoded);
+                  if (next === decoded) break;
+                  decoded = next;
+                }
+                var url = new URL(raw, HOME);
+                return url.origin === new URL(HOME).origin ? url.href : HOME;
+              } catch (error) {
+                return HOME;
+              }
+            }
+
+            var target = destination(new URLSearchParams(window.location.search).get('path'));
+            var directLinks = document.querySelectorAll('[data-direct]');
+            for (var i = 0; i < directLinks.length; i += 1) directLinks[i].setAttribute('href', target);
+
+            var frame = document.createElementNS(XHTML, 'iframe');
+            frame.setAttribute('id', 'kkeep-frame');
+            frame.setAttribute('title', 'Kkeep website');
+            frame.setAttribute('allow', 'fullscreen; autoplay; gamepad; clipboard-write');
+            frame.setAttribute('allowfullscreen', 'allowfullscreen');
+            frame.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+            frame.addEventListener('load', function () {
+              // A load event only ends the opening overlay; it does not verify app health.
+              window.clearTimeout(timer);
+              loading.hidden = true;
+            });
+            frame.addEventListener('error', showFallback);
+
+            function showFallback() {
+              window.clearTimeout(timer);
+              loading.hidden = false;
+              status.textContent = 'Kkeep is taking longer to open.';
+              slowNote.hidden = false;
+              retry.hidden = false;
+            }
+
+            function openKkeep() {
+              window.clearTimeout(timer);
+              tools.removeAttribute('open');
+              loading.hidden = false;
+              status.textContent = 'Opening Kkeep…';
+              slowNote.hidden = true;
+              retry.hidden = true;
+              timer = window.setTimeout(showFallback, 15000);
+              frame.setAttribute('src', target);
+            }
+
+            retry.addEventListener('click', openKkeep);
+            document.getElementById('reload').addEventListener('click', openKkeep);
+            document.addEventListener('keydown', function (event) {
+              if (event.key === 'Escape') tools.removeAttribute('open');
+            });
+            document.addEventListener('pointerdown', function (event) {
+              if (!tools.contains(event.target)) tools.removeAttribute('open');
+            });
+            openKkeep();
+            surface.insertBefore(frame, loading);
+          })();
+        ]]></script>
+      </body>
+    </html>
+  </foreignObject>
+</svg>
