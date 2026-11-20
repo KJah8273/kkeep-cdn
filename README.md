@@ -69,7 +69,13 @@ Verified on 20 November 2026:
 - A `?path=%2Fgames` link opened the Games page.
 - Reload and Open Kkeep directly worked.
 - The page filled an 820 × 1180 viewport correctly.
+- The tab-cover preview and Return to Kkeep controls worked on the published launcher. The Games page remained open underneath the cover.
+- Focused visibility-handler checks passed for repeated hidden/visible transitions, title updates, iframe preservation, and manual preview reset.
+
+The automated browser session continued to report background documents as visible. Automatic switching could therefore not be confirmed end to end in that session; the manual controls and visibility-handler logic were checked separately. A normal browser tab switch remains a device-level verification step.
 
 A viewport check is not a physical iPad or Safari test. Profile authentication, every game, every social app, and long-session reliability were not verified. The cookie and backend limitations above still apply.
 
 ![Kkeep running through the SVG launcher](preview.jpg)
+
+![Alef preview in the published Kkeep tab cover](cover-preview.jpg)
