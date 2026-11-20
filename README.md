@@ -48,4 +48,16 @@ Only paths on `https://kkeep.fun` are accepted. Schemes, protocol-relative addre
 
 ## Validation
 
-The SVG must parse as XML, and its CDATA JavaScript must pass a syntax check. Deployment should additionally be checked in a browser, including opening Kkeep, in-frame navigation, the tools menu, a representative game, and the direct-opening fallback. XML and syntax checks alone do not verify login or game compatibility.
+Verified on 20 November 2026:
+
+- The CDN returned HTTP 200 with `Content-Type: image/svg+xml`.
+- XML parsing, JavaScript syntax, and focused route validation passed.
+- The live homepage rendered through the CDN URL in desktop Brave.
+- In-frame Games navigation and Blumgi Racers rendering worked.
+- A `?path=%2Fgames` link opened the Games page.
+- Reload and Open Kkeep directly worked.
+- The page filled an 820 × 1180 viewport correctly.
+
+A viewport check is not a physical iPad or Safari test. Profile authentication, every game, every social app, and long-session reliability were not verified. The cookie and backend limitations above still apply.
+
+![Kkeep running through the SVG launcher](preview.jpg)
