@@ -1,6 +1,6 @@
 # Kkeep CDN launcher
 
-A small, original SVG launcher that displays the live Kkeep website in a full-size iframe. It opens Kkeep automatically and provides a compact **•••** menu for reloading or opening Kkeep directly.
+A small, original SVG launcher that displays the live Kkeep website in a full-size iframe. It opens Kkeep automatically and provides a compact **•••** menu for reloading, previewing the tab cover, or opening Kkeep directly.
 
 ## What it runs
 
@@ -37,6 +37,18 @@ https://cdn.jsdelivr.net/gh/KJah8273/kkeep-cdn@main/index.svg?path=%2Fplay%2Fblu
 ```
 
 Only paths on `https://kkeep.fun` are accepted. Schemes, protocol-relative addresses, backslashes, control characters, and malformed encoding are rejected and fall back to the homepage. The **Reload Kkeep** and **Open Kkeep directly** controls use the original requested route. Navigation inside the cross-origin frame is not mirrored into the launcher address.
+
+## Tab cover
+
+When the document becomes hidden, its `visibilitychange` handler covers Kkeep with the noninteractive `study-cover.jpg` preview and changes both SVG and XHTML titles to **Alef Education**. When the document becomes visible, the cover disappears and the titles return to **Kkeep**. Clicking inside the game or moving focus to the embedded page does not activate the cover.
+
+The Kkeep iframe stays mounted with its existing URL throughout tab switches. The cover does not reload the game, navigate it, change the browser address, or create a second copy of the website. Browsers and games may independently pause or throttle background activity.
+
+The image contains an empty Alef sign-in-page preview, with no interactive login fields. Its caption identifies it as a preview and links directly to **https://www.alefed.com** for official sign-in; no credentials, OAuth state, or copied login flow are used. The screenshot is an image, not an Alef login service.
+
+Use **••• → Preview tab cover** to inspect the cover while the tab is visible, and **Return to Kkeep** to close it. Switching away and back also clears the manual preview. Kkeep's tools are hidden while the cover is displayed.
+
+Tab thumbnails and app-switcher screenshots are controlled by the browser or operating system. They may capture the page before the visibility handler runs or retain an earlier thumbnail, so the cover cannot guarantee a changed preview. No physical iPad testing is claimed.
 
 ## Browser behavior and limits
 

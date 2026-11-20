@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" style="display:block;background:#050506;overflow:hidden">
-  <title>Kkeep</title>
+  <title id="kkeep-svg-title">Kkeep</title>
   <foreignObject width="100%" height="100%">
     <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-        <title>Kkeep</title>
+        <title id="kkeep-html-title">Kkeep</title>
         <style><![CDATA[
           :root { color-scheme: dark; }
           * { box-sizing: border-box; }
@@ -31,6 +31,11 @@
           #tools .panel { position: absolute; right: 0; top: 38px; width: 185px; padding: 5px; border: 1px solid #ffffff24; border-radius: 12px; background: #141419f5; box-shadow: 0 10px 30px #0005; }
           #tools button, #tools a { display: block; width: 100%; border: 0; border-radius: 7px; padding: 11px 10px; background: transparent; color: #ededf2; text-align: left; text-decoration: none; font: inherit; }
           #tools button:hover, #tools a:hover { background: #ffffff12; }
+          #study-cover { position: fixed; z-index: 3; inset: 0; display: flex; flex-direction: column; background: #fff; color: #283343; }
+          #study-cover img { display: block; flex: 1 1 auto; min-height: 0; width: 100%; height: 100%; object-fit: contain; background: #fff; pointer-events: none; user-select: none; }
+          .cover-caption { flex: 0 0 auto; padding: 11px 16px max(11px, env(safe-area-inset-bottom)); border-top: 1px solid #e8ebef; background: #fff; color: #596574; text-align: center; font-size: 12px; line-height: 1.5; }
+          .cover-caption a { color: #2360a4; text-underline-offset: 3px; }
+          #return-to-kkeep { position: absolute; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); padding: 10px 14px; border: 1px solid #d6dde6; border-radius: 10px; background: #fff; color: #283343; box-shadow: 0 3px 14px #18345414; }
           a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid #b5b5ff; outline-offset: 3px; }
           .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
           @keyframes spin { to { transform: rotate(360deg); } }
@@ -54,9 +59,15 @@
           <summary title="Kkeep tools"><span aria-hidden="true">•••</span><span class="sr-only">Kkeep tools</span></summary>
           <div class="panel">
             <button id="reload" type="button">Reload Kkeep</button>
+            <button id="preview-cover" type="button">Preview tab cover</button>
             <a data-direct="true" href="https://kkeep.fun/" target="_top">Open Kkeep directly ↗</a>
           </div>
         </details>
+        <section id="study-cover" aria-label="Alef Education preview" hidden="hidden">
+          <img src="study-cover.jpg" alt="Alef Education sign-in page preview. This is an image, not a login form." draggable="false" loading="eager" decoding="async" />
+          <div class="cover-caption">Alef preview · <a href="https://www.alefed.com" target="_blank" rel="noopener noreferrer">Sign in on the official site</a></div>
+          <button id="return-to-kkeep" type="button" hidden="hidden">Return to Kkeep</button>
+        </section>
         <script><![CDATA[
           (function () {
             'use strict';
@@ -68,7 +79,49 @@
             var slowNote = document.getElementById('slow-note');
             var retry = document.getElementById('retry');
             var tools = document.getElementById('tools');
+            var cover = document.getElementById('study-cover');
+            var returnButton = document.getElementById('return-to-kkeep');
+            var manualPreview = false;
             var timer;
+
+            function updateTitle(text) {
+              document.getElementById('kkeep-svg-title').textContent = text;
+              document.getElementById('kkeep-html-title').textContent = text;
+              try { document.title = text; } catch (error) { /* SVG titles above remain valid. */ }
+            }
+
+            function syncCover() {
+              var pageHidden = document.visibilityState === 'hidden' || document.hidden === true;
+              var showCover = pageHidden || manualPreview;
+              cover.hidden = !showCover;
+              tools.hidden = showCover;
+              returnButton.hidden = pageHidden || !manualPreview;
+              updateTitle(pageHidden ? 'Alef Education' : 'Kkeep');
+              if (showCover) {
+                tools.removeAttribute('open');
+                surface.setAttribute('inert', '');
+                surface.setAttribute('aria-hidden', 'true');
+              } else {
+                surface.removeAttribute('inert');
+                surface.removeAttribute('aria-hidden');
+              }
+              // The existing iframe stays mounted; tab changes never navigate or reload it.
+            }
+
+            document.addEventListener('visibilitychange', function () {
+              manualPreview = false;
+              syncCover();
+            });
+            document.getElementById('preview-cover').addEventListener('click', function () {
+              manualPreview = true;
+              syncCover();
+              returnButton.focus();
+            });
+            returnButton.addEventListener('click', function () {
+              manualPreview = false;
+              syncCover();
+              frame.focus();
+            });
 
             function destination(raw) {
               if (!raw) return HOME;
@@ -140,6 +193,7 @@
             });
             openKkeep();
             surface.insertBefore(frame, loading);
+            syncCover();
           })();
         ]]></script>
       </body>
