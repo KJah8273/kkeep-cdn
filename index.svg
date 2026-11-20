@@ -96,7 +96,7 @@
             var frame = document.createElementNS(XHTML, 'iframe');
             frame.setAttribute('id', 'kkeep-frame');
             frame.setAttribute('title', 'Kkeep website');
-            frame.setAttribute('allow', 'fullscreen; autoplay; gamepad; clipboard-write');
+            frame.setAttribute('allow', 'fullscreen; autoplay; encrypted-media; picture-in-picture; gamepad; clipboard-write');
             frame.setAttribute('allowfullscreen', 'allowfullscreen');
             frame.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
             frame.addEventListener('load', function () {
@@ -132,6 +132,11 @@
             });
             document.addEventListener('pointerdown', function (event) {
               if (!tools.contains(event.target)) tools.removeAttribute('open');
+            });
+            window.addEventListener('blur', function () {
+              window.setTimeout(function () {
+                if (document.activeElement === frame) tools.removeAttribute('open');
+              }, 0);
             });
             openKkeep();
             surface.insertBefore(frame, loading);

@@ -12,7 +12,7 @@ This is an embedded live website, not an independent copy of Kkeep or a proxy se
 
 ## Public URLs
 
-After publishing this directory to the public `KJah8273/kkeep-cdn` repository, use:
+Open the public launcher:
 
 ```text
 https://cdn.jsdelivr.net/gh/KJah8273/kkeep-cdn@main/index.svg
@@ -43,7 +43,7 @@ Only paths on `https://kkeep.fun` are accepted. Schemes, protocol-relative addre
 - An iframe `load` event hides the opening overlay; it does not prove that the app, login, or a game is healthy. The tools menu remains available. If no load event arrives within 15 seconds, the launcher shows retry and direct-opening options.
 - Kkeep must permit embedding. `Content-Security-Policy: frame-ancestors` and `X-Frame-Options` headers can prevent the iframe from displaying.
 - Kkeep cookies marked `SameSite=Strict` are not available to a cross-site embedded session. Safari and iPad browsers also restrict third-party cookies. Profile login or session persistence can therefore require **Open Kkeep directly**. This launcher does not bypass those protections or copy credentials into the shared jsDelivr origin.
-- Fullscreen, autoplay, gamepad, and clipboard-write are delegated to the frame, subject to browser support, browser policy, and user gestures. Camera and microphone are not delegated. Existing game/device compatibility limits remain.
+- Fullscreen, autoplay, encrypted media, picture-in-picture, gamepad, and clipboard-write are delegated to the frame, subject to browser support, browser policy, and user gestures. Camera and microphone are not delegated. Existing game/device compatibility limits remain.
 - The page uses its own SVG/XHTML markup and JavaScript. It does not include the reference website's code, branding, advertising, or tracking.
 
 ## Validation
